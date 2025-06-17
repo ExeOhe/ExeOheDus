@@ -13,13 +13,13 @@ source venv/bin/activate  # On Mac/Linux
 ```
 
 
-Install dependencies:
+Install dependencies: INSIDE OF VENV
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the scraper:
+Run the scraper: INSIDE OF VENV
 
 ```bash
 python -m src.scraper
