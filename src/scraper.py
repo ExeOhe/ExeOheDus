@@ -24,8 +24,8 @@ def fetch_page_with_selenium(url: str) -> str:
 
 
 def parse_market_cap(text):
-    text = text.replace('$', '').replace(',', '').strip()
-    if text.endswith('K'):
+    text = text.lower().replace('market cap:', '').replace('$', '').replace(',', '').strip()
+    if text.endswith('k'):
         return int(float(text[:-1]) * 1000)
     return int(text)
 
