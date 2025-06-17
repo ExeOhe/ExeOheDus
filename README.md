@@ -2,7 +2,16 @@
 
 PumpFun memecoin scraper detecting tokens that pumped above 30k twice.
 
-## Usage
+## Setup (Recommended)
+
+Create and activate a virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Mac/Linux
+# .\venv\Scripts\activate  # On Windows
+```
+
 
 Install dependencies:
 
