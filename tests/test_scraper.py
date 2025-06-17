@@ -7,9 +7,11 @@ from src import scraper
 
 def test_scrape_pumpfun(monkeypatch):
     html = '''
-    <div class="token"><span class="name">FOO</span><span class="pump-count">2</span><span class="volume">32000</span></div>
-    <div class="token"><span class="name">BAR</span><span class="pump-count">1</span><span class="volume">50000</span></div>
+    <div class="flex h-fit w-full overflow-hidden border p-2 group-hover:border-white border-transparent max-h-[300px] gap-2">
+        <span class="break-anywhere w-full break-words text-sm">FOO</span>
+        <span class="flex gap-1 text-xs text-green-300">$32.0K</span>
+    </div>
     '''
-    monkeypatch.setattr(scraper, 'fetch_page', lambda url: html)
+    monkeypatch.setattr(scraper, 'fetch_page_with_selenium', lambda url: html)
     tokens = scraper.scrape_pumpfun()
-    assert tokens == [{'name': 'FOO', 'volume': 32000, 'pumps': 2}]
+    assert tokens == [{'name': 'FOO', 'market_cap': 32000}]
