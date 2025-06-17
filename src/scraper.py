@@ -12,13 +12,11 @@ def fetch_page(url: str) -> str:
 def parse_pumps(html: str):
     soup = BeautifulSoup(html, "html.parser")
     tokens = []
-    for token in soup.select("div.token"):  # Update this selector to match the actual token card class
-        name = token.select_one(".name").get_text(strip=True)
-        pump_count = int(token.select_one(".pump-count").get_text())
-        if pump_count >= 2:
-            market_cap = int(token.select_one(".market-cap").get_text().replace('$', '').replace(',', ''))
-            if market_cap >= THRESHOLD:
-                tokens.append({"name": name, "market_cap": market_cap, "pumps": pump_count})
+    for token in soup.select("flex h-fit w-full overflow-hidden border p-2 group-hover:border-white  border-transparent max-h-[300px] gap-2"):  # Update this selector to match the actual token card class
+     name = token.select_one("break-anywhere w-full break-words text-sm").get_text(strip=True)
+     market_cap = int(token.select_one("flex gap-1 text-xs text-green-300").get_text().replace('$', '').replace(',', ''))
+     if market_cap >= THRESHOLD:
+      tokens.append({"name": name, "market_cap": market_cap})
     return tokens
 
 
