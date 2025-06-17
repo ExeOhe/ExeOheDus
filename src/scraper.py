@@ -1,5 +1,8 @@
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import time
 from .config import PUMPFUN_URL, THRESHOLD, PROXY
 
 
@@ -7,6 +10,17 @@ def fetch_page(url: str) -> str:
     response = requests.get(url, proxies={"http": PROXY, "https": PROXY} if PROXY else None)
     response.raise_for_status()
     return response.text
+
+
+def fetch_page_with_selenium(url: str) -> str:
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    time.sleep(5)  # Wait for JS to load tokens
+    html = driver.page_source
+    driver.quit()
+    return html
 
 
 def parse_market_cap(text):
@@ -30,7 +44,7 @@ def parse_pumps(html: str):
 
 
 def scrape_pumpfun():
-    html = fetch_page(PUMPFUN_URL)
+    html = fetch_page_with_selenium(PUMPFUN_URL)
     tokens = parse_pumps(html)
     return tokens
 
