@@ -11,15 +11,14 @@ def fetch_page(url: str) -> str:
 
 def parse_pumps(html: str):
     soup = BeautifulSoup(html, "html.parser")
-    # Placeholder: adapt to PumpFun's actual HTML structure
     tokens = []
-    for token in soup.select("div.token"):  # Example selector
+    for token in soup.select("div.token"):  # Update this selector to match the actual token card class
         name = token.select_one(".name").get_text(strip=True)
         pump_count = int(token.select_one(".pump-count").get_text())
         if pump_count >= 2:
-            volume = int(token.select_one(".volume").get_text().replace(',', ''))
-            if volume >= THRESHOLD:
-                tokens.append({"name": name, "volume": volume, "pumps": pump_count})
+            market_cap = int(token.select_one(".market-cap").get_text().replace('$', '').replace(',', ''))
+            if market_cap >= THRESHOLD:
+                tokens.append({"name": name, "market_cap": market_cap, "pumps": pump_count})
     return tokens
 
 
