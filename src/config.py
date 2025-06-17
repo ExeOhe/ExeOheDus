@@ -1,4 +1,4 @@
-PUMPFUN_URL = "https://pump.fun"
+PUMPFUN_URL = "https://pump.fun/board"
 THRESHOLD = 30000
 
 # If using environment variables or .env file for API keys, proxies, etc.
