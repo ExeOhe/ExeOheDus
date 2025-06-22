@@ -17,8 +17,3 @@ def fetch_tokens():
 def scrape_pumpfun():
     return fetch_tokens()
 
-if __name__ == "__main__":
-    from .storage import save_results
-    tokens = scrape_pumpfun()
-    save_results(tokens)
-    print(f"Saved {len(tokens)} tokens")
