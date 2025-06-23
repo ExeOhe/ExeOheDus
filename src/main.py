@@ -1,21 +1,22 @@
-from pumpportal_client import discover_tokens, stream_tokens  # <-- FIXED: added stream_tokens
-from bitquery_client import get_market_caps
-from logic import broke_above_twice
-from storage import save_results
-from config import THRESHOLD
-import datetime
 import argparse
 import asyncio
+import datetime
+
+from .pumpportal_client import discover_tokens, stream_tokens
+from .bitquery_client import get_market_caps
+from .logic import broke_above_twice
+from .storage import save_results
+from .config import THRESHOLD
 
 # Main entry point for the script
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", choices=["scan", "stream"], required=True)
-    parser.add_argument("--limit", type=int, default=10)  # 👈 Add this line
+    parser.add_argument("--limit", type=int, default=10)
     args = parser.parse_args()
 
     if args.task == "scan":
-        tokens = discover_tokens(limit=args.limit)  # <-- Use the argument here
+        tokens = discover_tokens(limit=args.limit)
         since = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
         results = []
 
@@ -23,7 +24,7 @@ if __name__ == "__main__":
             mint = token["mint"]
             name = token["name"]
             try:
-                history = get_market_caps(mint, since)  # <-- Use 'mint' instead of 'address'
+                history = get_market_caps(mint, since)
                 if broke_above_twice(history, THRESHOLD):
                     results.append({
                         "name": name,
@@ -37,6 +38,6 @@ if __name__ == "__main__":
         print(f"Saved {len(results)} tokens")
 
     elif args.task == "stream":
-        tokens = asyncio.run(stream_tokens(duration=30))  # Adjust duration if needed
+        tokens = asyncio.run(stream_tokens(duration=30))
         save_results(tokens)
         print(f"Saved {len(tokens)} streamed tokens")
