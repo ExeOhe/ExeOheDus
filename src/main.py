@@ -11,7 +11,7 @@ import asyncio
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", choices=["scan", "stream"], required=True)
-    parser.add_argument("--limit", type=int, default=20)  # 👈 Add this line
+    parser.add_argument("--limit", type=int, default=10)  # 👈 Add this line
     args = parser.parse_args()
 
     if args.task == "scan":
