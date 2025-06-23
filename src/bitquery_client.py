@@ -21,7 +21,7 @@ def get_market_caps(token_address, since):
         }}
         """
     }
-    response = requests.post(BITQUERY_ENDPOINT, json=query, headers=headers)
+    response = requests.post(BITQUERY_API_URL, json=query, headers=headers)
     response.raise_for_status()
     result = response.json()
     return [entry["quotePrice"] for entry in result["data"]["ethereum"]["dexTrades"]]
