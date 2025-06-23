@@ -2,6 +2,7 @@
 import asyncio
 import websockets
 import json
+import requests
 
 async def stream_tokens(duration=30):
     uri = "wss://pumpportal.fun/api/data"
@@ -19,3 +20,16 @@ async def stream_tokens(duration=30):
             print(f"WebSocket error: {e}")
 
     return results
+
+def discover_tokens(limit=20):
+    url = "https://pumpportal.fun/api/data"
+    response = requests.get(url)
+    response.raise_for_status()
+    data = response.json()
+    tokens = []
+    for item in data[:limit]:
+        tokens.append({
+            "address": item.get("token_address"),
+            "name": item.get("token_name")
+        })
+    return tokens
