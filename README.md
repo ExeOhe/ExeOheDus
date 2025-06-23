@@ -25,3 +25,13 @@ python3 -m src.main --task scan
 
 # 6. Or run the stream task (real-time token stream)
 python3 -m src.main --task stream
+
+## 📊 How Results Are Generated
+
+- The scanner identifies tokens that have exceeded a $30,000 market cap at least twice in the last 7 days.
+- For each qualifying token, the output includes up to the last 3 hourly market cap snapshots (one per hour, if available).
+- This approach provides a clear, time-separated view of each asset’s recent momentum, making it easier to spot trends and analyze token performance.
+- If a token has no updates for a given hour, that hour will be skipped in the results.
+- Duplicate timestamps are avoided, ensuring each hourly entry is unique and actionable.
+
+Results are saved to `pump_results.json` for further analysis or review.
