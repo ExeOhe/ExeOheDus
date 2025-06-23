@@ -1,5 +1,6 @@
 import requests
 from .config import BITQUERY_API_KEY, BITQUERY_API_URL
+import datetime
 
 def get_market_caps(token_mint, since=None):
     headers = {
@@ -49,7 +50,6 @@ def get_market_caps(token_mint, since=None):
     return []
 
 def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=100):
-    import datetime
     headers = {
         "Authorization": f"Bearer {BITQUERY_API_KEY}",
         "Content-Type": "application/json"
@@ -113,8 +113,24 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
             if block_time_dt >= since_dt:
                 token_counts[mint].append((cap, time))
     # Filter tokens that exceeded threshold at least min_times
-    return [
+    results = [
         {"mint": mint, "history": history}
         for mint, history in token_counts.items()
         if len(history) >= min_times
     ]
+
+    # Filter each token's history to 1-hour intervals
+    for token in results:
+        token["history"] = filter_history_by_interval(token["history"], min_interval_minutes=60)
+
+    return results
+
+def filter_history_by_interval(history, min_interval_minutes=60):
+    filtered = []
+    last_time = None
+    for cap, ts in sorted(history, key=lambda x: x[1]):
+        dt = datetime.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        if last_time is None or (dt - last_time).total_seconds() >= min_interval_minutes * 60:
+            filtered.append([cap, ts])
+            last_time = dt
+    return filtered
