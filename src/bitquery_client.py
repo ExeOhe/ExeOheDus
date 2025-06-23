@@ -1,5 +1,5 @@
 import requests
-from .config import BITQUERY_API_KEY, BITQUERY_API_URL
+from config import BITQUERY_API_KEY, BITQUERY_API_URL
 
 def get_token_supply(token_mint):
     headers = {
