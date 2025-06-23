@@ -15,7 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.task == "scan":
-        tokens = discover_tokens(limit=10)
+        tokens = discover_tokens(limit=args.limit)  # <-- Use the argument here
         since = (datetime.datetime.utcnow() - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
         results = []
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
             mint = token["mint"]
             name = token["name"]
             try:
-                history = get_market_caps(address, since)
+                history = get_market_caps(mint, since)  # <-- Use 'mint' instead of 'address'
                 if broke_above_twice(history, THRESHOLD):
                     results.append({
                         "name": name,
