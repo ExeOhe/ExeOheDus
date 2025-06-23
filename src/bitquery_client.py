@@ -10,9 +10,13 @@ def get_token_supply(token_mint):
     query = {
         "query": f"""
         {{
-            solana(network: solana) {{
-                tokens(mintAddress: {{is: \"{token_mint}\"}}) {{
-                    totalSupply
+            Solana(network: solana) {{
+                TokenSupplyUpdates(
+                    mintAddress: {{is: \"{token_mint}\"}}
+                    limit: 1
+                    orderBy: [blockHeight_desc]
+                ) {{
+                    supply
                 }}
             }}
         }}
@@ -21,9 +25,12 @@ def get_token_supply(token_mint):
     response = requests.post(BITQUERY_API_URL, json=query, headers=headers)
     response.raise_for_status()
     result = response.json()
-    tokens = result["data"]["solana"]["tokens"]
-    if tokens and tokens[0]["totalSupply"]:
-        return float(tokens[0]["totalSupply"])
+    if "data" not in result:
+        print("Bitquery API response (get_token_supply):", result)
+        return None
+    tokens = result["data"]["Solana"]["TokenSupplyUpdates"]
+    if tokens and tokens[0]["supply"]:
+        return float(tokens[0]["supply"])
     return None
 
 def get_market_caps(token_mint, since, interval="hour"):
@@ -37,13 +44,15 @@ def get_market_caps(token_mint, since, interval="hour"):
     query = {
         "query": f"""
         {{
-            solana(network: solana) {{
-                dexTrades(
+            Solana(network: solana) {{
+                DEXTrades(
                     baseCurrency: {{is: \"{token_mint}\"}},
                     time: {{since: \"{since}\"}}
                 ) {{
-                    timeInterval {{ {interval} }}
-                    quotePrice
+                    timeInterval {{
+                        {interval}
+                    }}
+                    PriceInUSD
                 }}
             }}
         }}
@@ -52,5 +61,8 @@ def get_market_caps(token_mint, since, interval="hour"):
     response = requests.post(BITQUERY_API_URL, json=query, headers=headers)
     response.raise_for_status()
     result = response.json()
-    prices = [entry["quotePrice"] for entry in result["data"]["solana"]["dexTrades"]]
+    if "data" not in result:
+        print("Bitquery API response (get_market_caps):", result)
+        return []
+    prices = [entry["PriceInUSD"] for entry in result["data"]["Solana"]["DEXTrades"]]
     return [price * supply for price in prices]
