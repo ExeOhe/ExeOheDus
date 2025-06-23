@@ -2,6 +2,7 @@
 import asyncio
 import websockets
 import json
+import time
 
 async def stream_tokens(duration=30):
     uri = "wss://pumpportal.fun/api/data"
@@ -20,14 +21,15 @@ async def stream_tokens(duration=30):
 
     return results
 
-async def _discover_tokens_ws(limit=20):
+async def _discover_tokens_ws(limit=20, timeout=10):
     uri = "wss://pumpportal.fun/api/data"
     tokens = []
+    start = time.time()
 
     async with websockets.connect(uri) as ws:
         await ws.send(json.dumps({"method": "subscribeNewToken"}))
 
-        while len(tokens) < limit:
+        while len(tokens) < limit and (time.time() - start) < timeout:
             try:
                 data = await ws.recv()
                 obj = json.loads(data)
@@ -44,7 +46,7 @@ async def _discover_tokens_ws(limit=20):
 
     return tokens
 
-def discover_tokens(limit=20):
-    return asyncio.run(_discover_tokens_ws(limit))
+def discover_tokens(limit=20, timeout=10):
+    return asyncio.run(_discover_tokens_ws(limit, timeout))
 # This function is a synchronous wrapper around the asynchronous _discover_tokens_ws function.
 # It allows you to call discover_tokens without needing to manage the event loop directly.
