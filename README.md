@@ -34,3 +34,14 @@ Run unit tests with pytest:
 ```bash
 pytest
 ```
+
+## 🔐 API Key Setup
+
+To use this tool, you'll need a free Bitquery API key.
+
+1. Sign up at https://bitquery.io/
+2. Go to your dashboard and copy your API key
+3. In your terminal:
+
+```bash
+export BITQUERY_API_KEY=your_api_key_here
