@@ -23,6 +23,9 @@ def get_market_caps(token_mint, since=None):
               TokenSupplyUpdate {{
                 PostBalanceInUSD
               }}
+              Block {{
+                Time
+              }}
             }}
           }}
         }}
@@ -34,7 +37,7 @@ def get_market_caps(token_mint, since=None):
         resp.raise_for_status()
         result = resp.json()
 
-        updates = result.get("data", {}).get("TokenSupplyUpdates", [])
+        updates = result.get("data", {}).get("Solana", {}).get("TokenSupplyUpdates", [])
         if updates:
             cap = updates[0]["TokenSupplyUpdate"].get("PostBalanceInUSD")
             if cap:
@@ -45,7 +48,7 @@ def get_market_caps(token_mint, since=None):
     print(f"No market cap available for {token_mint}: {result}")
     return []
 
-def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=1000):
+def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=100):
     import datetime
     headers = {
         "Authorization": f"Bearer {BITQUERY_API_KEY}",
@@ -60,7 +63,7 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
               where: {{
                 TokenSupplyUpdate: {{
                   PostBalanceInUSD: {{ gt: "{threshold}" }}
-                }},
+                }}
               }}
               orderBy: {{ descending: Block_Time }}
               limit: {{ count: {limit} }}
@@ -68,7 +71,9 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
               TokenSupplyUpdate {{
                 Currency {{ MintAddress }}
                 PostBalanceInUSD
-                Block_Time
+              }}
+              Block {{
+                Time
               }}
             }}
           }}
@@ -83,11 +88,7 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
         print("Bitquery API did not return valid JSON:", resp.text)
         return []
 
-    if not result:
-        print("Bitquery API returned None or empty:", resp.text)
-        return []
-
-    if "data" not in result or result["data"] is None:
+    if not result or "data" not in result or result["data"] is None:
         print("Bitquery API response missing or null 'data':", result)
         return []
 
@@ -100,14 +101,13 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
         return []
 
     updates = result["data"]["Solana"]["TokenSupplyUpdates"]
-    # Group by mint and count
     from collections import defaultdict
-    since_dt = datetime.datetime.strptime(since, "%Y-%m-%d")
+    since_dt = datetime.datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
     token_counts = defaultdict(list)
     for u in updates:
         mint = u["TokenSupplyUpdate"]["Currency"]["MintAddress"]
         cap = float(u["TokenSupplyUpdate"]["PostBalanceInUSD"])
-        time = u["TokenSupplyUpdate"]["Block_Time"]
+        time = u.get("Block", {}).get("Time")
         if time:
             block_time_dt = datetime.datetime.fromisoformat(time.replace("Z", "+00:00"))
             if block_time_dt >= since_dt:
