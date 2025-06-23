@@ -69,7 +69,11 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
               limit: {{ count: {limit} }}
             ) {{
               TokenSupplyUpdate {{
-                Currency {{ MintAddress }}
+                Currency {{
+                    MintAddress
+                     Name
+                      Symbol
+                }}
                 PostBalanceInUSD
               }}
               Block {{
