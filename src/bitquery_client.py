@@ -51,7 +51,7 @@ def get_market_caps(token_mint, since=None):
     print(f"No market cap available for {token_mint}: {result}")
     return []
 
-def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=1000):
+def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=30, limit=1000):
     headers = {
         "Authorization": f"Bearer {BITQUERY_API_KEY}",
         "Content-Type": "application/json"
