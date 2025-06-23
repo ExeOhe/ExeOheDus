@@ -32,6 +32,7 @@ async def _discover_tokens_ws(limit=20, timeout=10):
         while len(tokens) < limit and (time.time() - start) < timeout:
             try:
                 data = await ws.recv()
+                print("Raw data received:", data)  # 👈 Add this line
                 obj = json.loads(data)
 
                 if "token_address" in obj and "token_name" in obj:
