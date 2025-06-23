@@ -6,7 +6,7 @@ import os
 load_dotenv()
 
 BITQUERY_API_KEY = os.getenv("BITQUERY_API_KEY")
-BITQUERY_API_URL = "https://graphql.bitquery.io"
+BITQUERY_API_URL = "https://streaming.bitquery.io/eap"
 
 THRESHOLD = 30000
 
