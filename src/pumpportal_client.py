@@ -21,7 +21,7 @@ async def stream_tokens(duration=30):
 
     return results
 
-async def _discover_tokens_ws(limit=20, timeout=10):
+async def _discover_tokens_ws(limit=20, timeout=None):
     uri = "wss://pumpportal.fun/api/data"
     tokens = []
     start = time.time()
@@ -29,7 +29,7 @@ async def _discover_tokens_ws(limit=20, timeout=10):
     async with websockets.connect(uri) as ws:
         await ws.send(json.dumps({"method": "subscribeNewToken"}))
 
-        while len(tokens) < limit and (time.time() - start) < timeout:
+        while len(tokens) < limit:
             try:
                 data = await ws.recv()
                # print("Raw data received:", data)  # 👈 Add this line
