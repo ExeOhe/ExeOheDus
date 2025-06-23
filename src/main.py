@@ -20,14 +20,14 @@ if __name__ == "__main__":
         results = []
 
         for token in tokens:
-            address = token["address"]
+            mint = token["mint"]
             name = token["name"]
             try:
                 history = get_market_caps(address, since)
                 if broke_above_twice(history, THRESHOLD):
                     results.append({
                         "name": name,
-                        "address": address,
+                        "mint": mint,
                         "market_cap": max(history)
                     })
             except Exception as e:

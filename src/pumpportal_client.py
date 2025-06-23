@@ -35,10 +35,10 @@ async def _discover_tokens_ws(limit=20, timeout=10):
                 print("Raw data received:", data)  # 👈 Add this line
                 obj = json.loads(data)
 
-                if "token_address" in obj and "token_name" in obj:
+                if "mint" in obj and "name" in obj:
                     tokens.append({
-                        "address": obj["token_address"],
-                        "name": obj["token_name"]
+                        "mint": obj["mint"],   # or use "mint" as the key if you want
+                        "name": obj["name"]
                     })
 
             except Exception as e:
