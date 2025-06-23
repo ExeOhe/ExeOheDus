@@ -72,7 +72,7 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
                 Currency {{
                     MintAddress
                      Name
-                      Symbol
+                     Symbol
                 }}
                 PostBalanceInUSD
               }}
@@ -108,17 +108,30 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
     from collections import defaultdict
     since_dt = datetime.datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
     token_counts = defaultdict(list)
+    token_meta = {}  # Store metadata for each mint
+
     for u in updates:
-        mint = u["TokenSupplyUpdate"]["Currency"]["MintAddress"]
+        currency = u["TokenSupplyUpdate"]["Currency"]
+        mint = currency["MintAddress"]
+        name = currency.get("Name")
+        symbol = currency.get("Symbol")
         cap = float(u["TokenSupplyUpdate"]["PostBalanceInUSD"])
         time = u.get("Block", {}).get("Time")
         if time:
             block_time_dt = datetime.datetime.fromisoformat(time.replace("Z", "+00:00"))
             if block_time_dt >= since_dt:
                 token_counts[mint].append((cap, time))
-    # Filter tokens that exceeded threshold at least min_times
+                # Save meta only once per mint
+                if mint not in token_meta:
+                    token_meta[mint] = {"name": name, "symbol": symbol}
+
     results = [
-        {"mint": mint, "history": history}
+        {
+            "mint": mint,
+            "name": token_meta[mint]["name"],
+            "symbol": token_meta[mint]["symbol"],
+            "history": history
+        }
         for mint, history in token_counts.items()
         if len(history) >= min_times
     ]
