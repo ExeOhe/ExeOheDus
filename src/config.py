@@ -1,7 +1,6 @@
 # File: src/config.py
 # If using environment variables or .env file for API keys, proxies, etc.
 from dotenv import load_dotenv
-
 import os
 
 load_dotenv()
