@@ -13,6 +13,13 @@ pip install -r requirements.txt
 # 4. Set Bitquery API key (temporarily for this session)
 export BITQUERY_API_KEY=your_api_key_here
 
+* Bitquery allows up to 10,000 free API calls per month. You can monitor usage by visiting:
+
+https://bitquery.io/user/billing
+
+For heavy usage or production deployments, consider upgrading your Bitquery plan. *
+
+
 # 5. Run the scanner task (checks for 2x $30K pumps)
 python3 -m src.main --task scan
 
