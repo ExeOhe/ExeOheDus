@@ -4,7 +4,7 @@ from .config import BITQUERY_API_KEY, BITQUERY_API_URL
 
 def get_token_supply(token_mint):
     headers = {
-        "X-API-KEY": BITQUERY_API_KEY,
+        "Authorization": f"Bearer {BITQUERY_API_KEY}",
         "Content-Type": "application/json"
     }
     query = {
@@ -31,7 +31,7 @@ def get_market_caps(token_mint, since, interval="hour"):
     if not supply:
         return []
     headers = {
-        "X-API-KEY": BITQUERY_API_KEY,
+        "Authorization": f"Bearer {BITQUERY_API_KEY}",
         "Content-Type": "application/json"
     }
     query = {
