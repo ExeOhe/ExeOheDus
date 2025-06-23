@@ -105,6 +105,10 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
         return []
 
     updates = result["data"]["Solana"]["TokenSupplyUpdates"]
+    if not updates:
+        print("No updates found in Bitquery response:", result)
+        return []
+
     from collections import defaultdict
     since_dt = datetime.datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
     token_counts = defaultdict(list)
