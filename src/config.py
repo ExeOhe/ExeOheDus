@@ -1,6 +1,10 @@
 # File: src/config.py
 # If using environment variables or .env file for API keys, proxies, etc.
+from dotenv import load_dotenv
+
 import os
+
+load_dotenv()
 
 BITQUERY_API_KEY = os.getenv("BITQUERY_API_KEY")
 BITQUERY_API_URL = "https://graphql.bitquery.io"
