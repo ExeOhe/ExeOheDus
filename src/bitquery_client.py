@@ -44,3 +44,77 @@ def get_market_caps(token_mint, since=None):
 
     print(f"No market cap available for {token_mint}: {result}")
     return []
+
+def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=1000):
+    import datetime
+    headers = {
+        "Authorization": f"Bearer {BITQUERY_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    since = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=since_days)).strftime("%Y-%m-%d")
+    query = {
+        "query": f"""
+        {{
+          Solana {{
+            TokenSupplyUpdates(
+              where: {{
+                TokenSupplyUpdate: {{
+                  PostBalanceInUSD: {{ gt: "{threshold}" }}
+                }},
+              }}
+              orderBy: {{ descending: Block_Time }}
+              limit: {{ count: {limit} }}
+            ) {{
+              TokenSupplyUpdate {{
+                Currency {{ MintAddress }}
+                PostBalanceInUSD
+                Block_Time
+              }}
+            }}
+          }}
+        }}
+        """
+    }
+    resp = requests.post(BITQUERY_API_URL, json=query, headers=headers)
+    resp.raise_for_status()
+    try:
+        result = resp.json()
+    except Exception as e:
+        print("Bitquery API did not return valid JSON:", resp.text)
+        return []
+
+    if not result:
+        print("Bitquery API returned None or empty:", resp.text)
+        return []
+
+    if "data" not in result or result["data"] is None:
+        print("Bitquery API response missing or null 'data':", result)
+        return []
+
+    if "Solana" not in result["data"] or result["data"]["Solana"] is None:
+        print("Bitquery API response missing or null 'Solana':", result)
+        return []
+
+    if "TokenSupplyUpdates" not in result["data"]["Solana"]:
+        print("Bitquery API response missing 'TokenSupplyUpdates':", result)
+        return []
+
+    updates = result["data"]["Solana"]["TokenSupplyUpdates"]
+    # Group by mint and count
+    from collections import defaultdict
+    since_dt = datetime.datetime.strptime(since, "%Y-%m-%d")
+    token_counts = defaultdict(list)
+    for u in updates:
+        mint = u["TokenSupplyUpdate"]["Currency"]["MintAddress"]
+        cap = float(u["TokenSupplyUpdate"]["PostBalanceInUSD"])
+        time = u["TokenSupplyUpdate"]["Block_Time"]
+        if time:
+            block_time_dt = datetime.datetime.fromisoformat(time.replace("Z", "+00:00"))
+            if block_time_dt >= since_dt:
+                token_counts[mint].append((cap, time))
+    # Filter tokens that exceeded threshold at least min_times
+    return [
+        {"mint": mint, "history": history}
+        for mint, history in token_counts.items()
+        if len(history) >= min_times
+    ]

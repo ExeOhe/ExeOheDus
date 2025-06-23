@@ -3,7 +3,7 @@ import asyncio
 import datetime
 
 from .pumpportal_client import discover_tokens, stream_tokens
-from .bitquery_client import get_market_caps
+from .bitquery_client import get_market_caps, find_tokens_exceeding_market_cap
 from .logic import broke_above_twice
 from .storage import save_results
 from .config import THRESHOLD
@@ -12,28 +12,16 @@ from .config import THRESHOLD
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", choices=["scan", "stream"], required=True)
-    parser.add_argument("--limit", type=int, default=10)
+    parser.add_argument("--limit", type=int, default=100)
     args = parser.parse_args()
 
     if args.task == "scan":
-        tokens = discover_tokens(limit=args.limit)
-        since = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
-        results = []
-
-        for token in tokens:
-            mint = token["mint"]
-            name = token["name"]
-            try:
-                history = get_market_caps(mint, since)
-                if broke_above_twice(history, THRESHOLD):
-                    results.append({
-                        "name": name,
-                        "mint": mint,
-                        "market_cap": max(history)
-                    })
-            except Exception as e:
-                print(f"Error for {name}: {e}")
-
+        results = find_tokens_exceeding_market_cap(
+            threshold=THRESHOLD,
+            min_times=2,
+            since_days=7,
+            limit=args.limit  # or higher if you want to scan more
+        )
         save_results(results)
         print(f"Saved {len(results)} tokens")
 
