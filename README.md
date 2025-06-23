@@ -1,47 +1,20 @@
-# ExeOheDus
+# ✅ ExeOheDus Setup (macOS/Linux)
 
-PumpFun memecoin scraper detecting tokens that pumped above 30k twice.
-
-## Setup (Recommended)
-
-Create and activate a virtual environment:
-
-```bash
+# 1. Create and activate virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Mac/Linux
-# .\venv\Scripts\activate  # On Windows
-```
+source venv/bin/activate
 
-
-Install dependencies: INSIDE OF VENV
-
-```bash
+# 2. Install dependencies
 pip install -r requirements.txt
-```
 
-Run the scraper: INSIDE OF VENV
+# 3. (macOS only) Fix SSL certificate errors if needed
+/Applications/Python\ 3.13/Install\ Certificates.command
 
-```bash
-python -m src.scraper
-```
-
-The results will be saved to `pump_results.json`.
-
-## Tests
-
-Run unit tests with pytest:
-
-```bash
-pytest
-```
-
-## 🔐 API Key Setup
-
-To use this tool, you'll need a free Bitquery API key.
-
-1. Sign up at https://bitquery.io/
-2. Go to your dashboard and copy your API key
-3. In your terminal:
-
-```bash
+# 4. Set Bitquery API key (temporarily for this session)
 export BITQUERY_API_KEY=your_api_key_here
+
+# 5. Run the scanner task (checks for 2x $30K pumps)
+python3 -m src.main --task scan
+
+# 6. Or run the stream task (real-time token stream)
+python3 -m src.main --task stream
