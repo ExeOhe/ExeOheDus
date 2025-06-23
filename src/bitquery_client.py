@@ -1,4 +1,5 @@
 import requests
+import os
 from .config import BITQUERY_API_KEY, BITQUERY_API_URL
 
 def get_token_supply(token_mint):
