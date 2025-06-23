@@ -12,7 +12,7 @@ from .config import THRESHOLD
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", choices=["scan", "stream"], required=True)
-    parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument("--limit", type=int, default=1000)
     args = parser.parse_args()
 
     if args.task == "scan":

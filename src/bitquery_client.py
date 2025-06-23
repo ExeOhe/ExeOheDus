@@ -1,5 +1,6 @@
 import requests
 from .config import BITQUERY_API_KEY, BITQUERY_API_URL
+from .logic import broke_above_twice
 import datetime
 from collections import OrderedDict, defaultdict
 
@@ -50,7 +51,7 @@ def get_market_caps(token_mint, since=None):
     print(f"No market cap available for {token_mint}: {result}")
     return []
 
-def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=100):
+def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7, limit=1000):
     headers = {
         "Authorization": f"Bearer {BITQUERY_API_KEY}",
         "Content-Type": "application/json"
@@ -62,9 +63,7 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
           Solana {{
             TokenSupplyUpdates(
               where: {{
-                TokenSupplyUpdate: {{
-                  PostBalanceInUSD: {{ gt: "{threshold}" }}
-                }}
+                # Removed PostBalanceInUSD filter to get all tokens
               }}
               orderBy: {{ descending: Block_Time }}
               limit: {{ count: {limit} }}
@@ -130,8 +129,9 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=7,
 
     results = []
     for mint, history in token_counts.items():
-        if len(history) >= min_times:
-            # Get last 3 hourly market caps for this token
+        # history is a list of [cap, time], so extract just the caps
+        caps = [cap for cap, _ in sorted(history, key=lambda x: x[1])]
+        if broke_above_twice(caps, threshold):
             hourly_history = get_last_n_hourly_market_caps(mint, n=3)
             results.append({
                 "mint": mint,
