@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     if args.task == "scan":
         tokens = discover_tokens(limit=args.limit)  # <-- Use the argument here
-        since = (datetime.datetime.utcnow() - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+        since = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
         results = []
 
         for token in tokens:
