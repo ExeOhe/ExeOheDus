@@ -21,13 +21,19 @@ if __name__ == "__main__":   # This block ONLY runs when you use the CLI
 
     since = (datetime.datetime.utcnow() - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
 
+    results = []  # <-- Initialize results list here
+
     for token in tokens:
         address = token["address"]
         name = token["name"]
         try:
             history = get_market_caps(address, since)
-            if broke_above_twice(history, THRESHOLD):  # ✅ Apply your logic
-                results.append({"name": name, "market_cap": max(history)})
+            if broke_above_twice(history, THRESHOLD):
+                results.append({
+                    "name": name,
+                    "address": address,  # <-- Add this line
+                    "market_cap": max(history)
+                })
         except Exception as e:
             print(f"Error for {name}: {e}")
 
