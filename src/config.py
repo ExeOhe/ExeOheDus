@@ -2,6 +2,7 @@
 # If using environment variables or .env file for API keys, proxies, etc.
 import os
 
-PROXY = os.getenv("PUMPFUN_PROXY")
-PUMPFUN_URL = "https://pump.fun/board"
+BITQUERY_API_KEY = os.getenv("BITQUERY_API_KEY")
+BITQUERY_API_URL = "https://graphql.bitquery.io"
+
 THRESHOLD = 30000
