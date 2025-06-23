@@ -1,5 +1,5 @@
 import requests
-from config import BITQUERY_API_KEY, BITQUERY_ENDPOINT
+from config import BITQUERY_API_KEY, BITQUERY_API_URL
 
 def get_market_caps(token_address, since):
     headers = {
