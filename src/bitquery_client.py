@@ -131,10 +131,10 @@ def find_tokens_exceeding_market_cap(threshold=30000, min_times=2, since_days=30
     for mint, history in token_counts.items():
         # history is a list of [cap, time], so extract just the caps
         caps = [cap for cap, _ in sorted(history, key=lambda x: x[1])]
-        # print(mint, caps)
         if all(cap == 0 for cap in caps):
             continue  # Skip tokens with only zero values
-        print(mint, caps)  # This will only print tokens that are not skipped
+            # print(mint, caps)  # This will only print tokens that have non-zero market caps
+            # Only fetch hourly caps if the token passes the logic
         if broke_above_twice(caps, threshold):
             hourly_history = get_last_n_hourly_market_caps(mint, n=3)
             results.append({
